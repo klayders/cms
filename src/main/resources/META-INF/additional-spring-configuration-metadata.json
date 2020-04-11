@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "admin.annotation.view.entity.field.grid.column",
+      "type": "java.lang.Object",
+      "description": "Description for admin.annotation.view.entity.field.grid.column."
+    }
+  ] }

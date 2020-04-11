@@ -1,0 +1,9 @@
+#admin.view.field.grid.column.annotation=com.spring.vaadin.cms.annotation.ColumnDisplayGrid
+admin:
+  view:
+    annotation:
+      entity.field:
+        grid:
+          column:
+            class: com.spring.vaadin.cms.annotation.ColumnDisplayGrid
+            order.method: displayOrder

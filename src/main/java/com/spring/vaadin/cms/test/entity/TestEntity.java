@@ -1,17 +1,26 @@
-package com.spring.vaadin.cms.service;
+package com.spring.vaadin.cms.test.entity;
 
 import com.spring.vaadin.cms.annotation.ColumnDisplayGrid;
+import com.spring.vaadin.cms.annotation.ColumnEditForm;
+
 
 public class TestEntity {
 
   @ColumnDisplayGrid(displayOrder = 0)
-  private int id;
+  private long id;
+
+  @ColumnEditForm(displayOrder = 0)
   @ColumnDisplayGrid(displayOrder = 1)
   private String name;
+
+  @ColumnEditForm(displayOrder = 1)
   @ColumnDisplayGrid(displayOrder = 2)
   private String description;
+
+  @ColumnEditForm(displayOrder = 2)
   @ColumnDisplayGrid(displayOrder = 3)
   private Short number;
+
   private Integer number1;
   private Long number2;
   private Double number3;
@@ -31,6 +40,14 @@ public class TestEntity {
     this.number3 = number3;
     this.number4 = number4;
     this.check = check;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
   }
 
   public Float getNumber4() {
@@ -87,14 +104,6 @@ public class TestEntity {
 
   public void setCheck(boolean check) {
     this.check = check;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
   }
 
   public String getName() {

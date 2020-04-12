@@ -1,4 +1,4 @@
-package com.spring.vaadin.cms.service;
+package com.spring.vaadin.cms.test;
 
 import java.lang.reflect.InvocationTargetException;
 

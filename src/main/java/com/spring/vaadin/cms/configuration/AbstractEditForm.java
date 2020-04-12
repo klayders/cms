@@ -1,5 +1,6 @@
 package com.spring.vaadin.cms.configuration;
 
+import com.spring.vaadin.cms.conf.EntityAnnotationParser;
 import com.spring.vaadin.cms.configuration.event.CloseEvent;
 import com.spring.vaadin.cms.configuration.event.DeleteEvent;
 import com.spring.vaadin.cms.configuration.event.SaveEvent;
@@ -25,6 +26,7 @@ import com.vaadin.flow.data.binder.Binder;
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 
@@ -34,8 +36,9 @@ public abstract class AbstractEditForm<T> extends FormLayout {
   private static final String ADMIN_I18N_PREFIX = "admin.";
 
   private final ApplicationContext applicationContext;
+  private final EntityAnnotationParser entityAnnotationParser;
 
-  //  private final Class<T> entityClass;
+  private final Class<T> entityClass;
   private final Binder<T> entityBinder;
   private final EntityService<T> repository;
   private final Grid<T> grid;
@@ -49,11 +52,13 @@ public abstract class AbstractEditForm<T> extends FormLayout {
   public AbstractEditForm(ApplicationContext applicationContext,
                           Class<T> entityClass,
                           EntityService<T> repository,
-                          Grid<T> grid) {
+                          Grid<T> grid,
+                          EntityAnnotationParser entityAnnotationParser) {
     this.grid = grid;
     this.repository = repository;
     this.applicationContext = applicationContext;
-    //    this.entityClass = entityClass;
+    this.entityAnnotationParser = entityAnnotationParser;
+    this.entityClass = entityClass;
 
     //    addClassName("entity-form");
     addClassName("achievement-type-form");
@@ -61,7 +66,7 @@ public abstract class AbstractEditForm<T> extends FormLayout {
     entityBinder = new BeanValidationBinder<>(entityClass);
 
     //    collectFieldsForVaadinForm(ManagedEntity.class);
-    bindFields(entityClass);
+    bindEntityFields();
 
     add(createButtonLayout());
 
@@ -109,23 +114,32 @@ public abstract class AbstractEditForm<T> extends FormLayout {
   }
 
 
-  private void bindFields(Class<?> entity) {
-    final var className = entity.getSimpleName();
+  private void bindEntityFields() {
+    final var className = entityClass.getSimpleName();
 
-    for (var field : entity.getDeclaredFields()) {
-      if (field.getName().equals("createdById") || field.getName().equals("id")) {
-        continue;
-      }
+    Stream.of(entityClass.getDeclaredFields())
+        //        .filter(field -> !field.getName().equals("createdById") || !field.getName().equals("id"))
+        .filter(field -> field.getAnnotation(entityAnnotationParser.annotationEditFormColumn()) != null)
+        .sorted((field1, field2) -> {
+          final var annotation1 = field1.getAnnotation(entityAnnotationParser.annotationGridColumn());
+          final var order1 = (Integer) entityAnnotationParser.getGridOrderByAnnotation(annotation1);
 
-      final var i18nFieldName = applicationContext.getMessage(
-          ADMIN_I18N_PREFIX + className.toLowerCase() + "." + field.getName(),
-          null,
-          field.getName(),
-          Locale.getDefault()
-      );
+          final var annotation2 = field2.getAnnotation(entityAnnotationParser.annotationGridColumn());
+          final var order2 = (Integer) entityAnnotationParser.getGridOrderByAnnotation(annotation2);
 
-      resolveAndBindField(field, i18nFieldName);
-    }
+          return order1.compareTo(order2);
+        })
+        .forEach(field -> {
+          final var i18nFieldName = applicationContext.getMessage(
+              ADMIN_I18N_PREFIX + className.toLowerCase() + "." + field.getName(),
+              null,
+              field.getName(),
+              Locale.getDefault()
+          );
+
+          resolveAndBindField(field, i18nFieldName);
+        });
+
   }
 
   private void resolveAndBindField(Field field, String i18nFieldName) {

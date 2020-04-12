@@ -9,13 +9,16 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
-import java.util.TreeMap;
+import java.util.stream.Stream;
+import lombok.Builder;
 import org.springframework.context.ApplicationContext;
 
 
 //@PageTitle("Медаль | Столото cms")
+@Builder
 public abstract class AbstractListView<T> extends VerticalLayout {
 
   private final ApplicationContext applicationContext;
@@ -36,7 +39,7 @@ public abstract class AbstractListView<T> extends VerticalLayout {
     this.entity = entityService.getEntityClass();
     this.entityGrid = new Grid<>(entityService.getEntityClass());
     this.entityAnnotationParser = entityAnnotationParser;
-    this.entityForm = new AbstractEditForm<>(this.applicationContext, this.entity, this.entityService, this.entityGrid) {};
+    this.entityForm = new AbstractEditForm<>(this.applicationContext, this.entity, this.entityService, this.entityGrid, this.entityAnnotationParser) {};
 
     //    entityForm = new TestForm(imageService.findAll(), applicationContext);
 
@@ -84,18 +87,21 @@ public abstract class AbstractListView<T> extends VerticalLayout {
     entityGrid.setSizeFull();
     //      grid.setColumns("type", "shortDescription", "row", "position", "description", "fullDescription", "smallPicId");
 
-    var sortedMapFields = new TreeMap<Object, String>();
-    //    fieldsList.add("published");
-    //    fieldsList.add("id");
-    for (var field : entity.getDeclaredFields()) {
-      for (var annotation : field.getAnnotations()) {
-        if (entityAnnotationParser.annotationGridColumn().equals(annotation.annotationType())) {
-          final Object gridOrderByAnnotation = entityAnnotationParser.getGridOrderByAnnotation(annotation);
-          sortedMapFields.put(gridOrderByAnnotation, field.getName());
-        }
-      }
-    }
-    entityGrid.setColumns(sortedMapFields.values().toArray(String[]::new));
+    var gridFields = Stream.of(entity.getDeclaredFields())
+        .filter(field -> field.getAnnotation(entityAnnotationParser.annotationGridColumn()) != null)
+        .sorted((field1, field2) -> {
+          var annotation1 = field1.getAnnotation(entityAnnotationParser.annotationGridColumn());
+          var order1 = (Integer) entityAnnotationParser.getGridOrderByAnnotation(annotation1);
+
+          var annotation2 = field2.getAnnotation(entityAnnotationParser.annotationGridColumn());
+          var order2 = (Integer) entityAnnotationParser.getGridOrderByAnnotation(annotation2);
+
+          return order1.compareTo(order2);
+        })
+        .map(Field::getName)
+        .toArray(String[]::new);
+
+    entityGrid.setColumns(gridFields);
 
     entityGrid.getColumns().forEach(column -> {
       column.setAutoWidth(true);

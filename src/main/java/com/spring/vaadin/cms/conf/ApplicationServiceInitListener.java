@@ -1,21 +1,18 @@
 package com.spring.vaadin.cms.conf;
 
 import com.spring.vaadin.cms.configuration.MainLayout;
-import com.spring.vaadin.cms.factory.EntityConfigModel;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ApplicationServiceInitListener<T> implements VaadinServiceInitListener {
+@RequiredArgsConstructor
+public class ApplicationServiceInitListener implements VaadinServiceInitListener {
 
-  private final List<EntityConfigModel<T>> factoryModels;
+  private final EntitiesContainer entityContainer;
 
-  public ApplicationServiceInitListener(List<EntityConfigModel<T>> factoryModels) {
-    this.factoryModels = factoryModels;
-  }
 
   @Override
   public void serviceInit(ServiceInitEvent event) {
@@ -23,8 +20,8 @@ public class ApplicationServiceInitListener<T> implements VaadinServiceInitListe
 
       var routeConfiguration = RouteConfiguration.forApplicationScope();
 
-      factoryModels.forEach(entityFactoryModel -> {
-        routeConfiguration.setRoute(entityFactoryModel.getRouterName(), entityFactoryModel.getAbstractListView().getClass(), MainLayout.class);
+      entityContainer.getEntitiesBeanRouterView().forEach((routerKey, beanView ) -> {
+        routeConfiguration.setRoute(routerKey, beanView.getClass(), MainLayout.class);
       });
 
     }

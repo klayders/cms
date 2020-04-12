@@ -1,5 +1,6 @@
-package com.spring.vaadin.cms.service;
+package com.spring.vaadin.cms.test.entity;
 
+import com.spring.vaadin.cms.service.EntityService;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;

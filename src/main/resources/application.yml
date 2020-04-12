@@ -7,3 +7,8 @@ admin:
           column:
             class: com.spring.vaadin.cms.annotation.ColumnDisplayGrid
             order.method: displayOrder
+
+        edit.form:
+          column:
+            class: com.spring.vaadin.cms.annotation.ColumnEditForm
+            order.method: displayOrder

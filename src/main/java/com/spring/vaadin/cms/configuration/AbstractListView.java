@@ -18,7 +18,6 @@ import org.springframework.context.ApplicationContext;
 
 
 //@PageTitle("Медаль | Столото cms")
-@Builder
 public abstract class AbstractListView<T> extends VerticalLayout {
 
   private final ApplicationContext applicationContext;

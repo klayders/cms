@@ -12,11 +12,11 @@ public class User {
 
   @ColumnEditForm(displayOrder = 0)
   @ColumnDisplayGrid(displayOrder = 1)
-  private String title;
+  private String firstName;
 
   @ColumnEditForm(displayOrder = 1)
   @ColumnDisplayGrid(displayOrder = 2)
-  private String description;
+  private String lastName;
 
   @ColumnEditForm(displayOrder = 2)
   @ColumnDisplayGrid(displayOrder = 3)

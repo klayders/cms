@@ -10,6 +10,9 @@ public class TestEntityService implements EntityService<TestEntity> {
 
   private final List<TestEntity> testEntities = new ArrayList<>();
 
+  public TestEntityService() {
+  }
+
   @Override
   public Class<TestEntity> getEntityClass() {
     return TestEntity.class;

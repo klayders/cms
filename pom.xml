@@ -10,7 +10,7 @@
 
 	<properties>
 		<java.version>14</java.version>
-		<vaadin.version>14.1.21</vaadin.version>
+		<vaadin.version>14.5.3</vaadin.version>
 		<spring.boot.version>2.2.6.RELEASE</spring.boot.version>
 	</properties>
 
